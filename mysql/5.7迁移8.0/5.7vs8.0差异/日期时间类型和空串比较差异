@@ -1,0 +1,15 @@
+mysql 5.7 和 8.0 的一个SQL差异：
+对date、dateetime、timestamp等时间类型 和 ''  空串比较表现形式不同
+5.7 和8.0.16之前版本 只会报 
+SELECT * from xxx where update_time !='' ;  
+Warning (code 1292): Incorrect datetime value: '' for column 'update_time' at row 1
+
+8.0.16版本及以后：
+SELECT * from xxx where update_time !='' ;  
+ERROR: 1525 (HY000): Incorrect DATETIME value: ''
+
+当然这种比较本身是没意义的，应该使用is not null来实现
+
+When comparing DATE values with constant strings, MySQL first tries to convert the string to a DATE and then to perform the comparison. When the conversion failed, MySQL executed the comparison treating the DATE as a string, which could lead to unpredictable behavior. Now in such cases, if the conversion of the string to a DATE fails, the comparison fails with ER_WRONG_VALUE. (Bug #29025656)
+
+https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-16.html
